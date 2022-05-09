@@ -3,54 +3,52 @@ require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 const nodemailer = require("nodemailer");
 const logger = require("./logger");
 
-const sendAlerts = async (sendingEmailArr) => {
-  console.log(sendingEmailArr);
-  let transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USERNAME,
-      pass: process.env.EMAIL_PASSWORD,
-    },
-  });
+let transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USERNAME,
+    pass: process.env.EMAIL_PASSWORD,
+  },
+});
 
-  let mailOptions = {
-    from: "alert@checkpersonnel.com",
-    to: process.env.EMAIL_TO,
-    subject: "Alert!!!",
-  };
+let mailOptions = {
+  from: "alert@checkpersonnel.com",
+  to: process.env.EMAIL_TO,
+  subject: "Alert!!!",
+};
 
-  for (const clinitian of sendingEmailArr) {
-    //prepare email data
-    const email = prepareEmailData(clinitian);
+const sendAlert = async (dataToSend) => {
+  //prepare email data
+  const email = prepareEmailData(dataToSend);
 
-    //prepare email message
-    mailOptions.html = htmlTemplate(email, "danger");
+  //prepare email message
+  mailOptions.html = htmlTemplate(email, "danger");
 
-    //send email
-    try {
-      const response = await transporter.sendMail(mailOptions);
-      logger.info(
-        "email was sent successfully about clinitian #" + clinitian.clinitianId
-      );
-    } catch (error) {
-      logger.error(error);
-    }
+  //send email
+  try {
+    const response = await transporter.sendMail(mailOptions);
+    logger.info(
+      "email was sent successfully about clinitian #" + dataToSend.clinitianId
+    );
+    return response;
+  } catch (error) {
+    logger.error(error);
   }
 };
 
-function prepareEmailData(clinitian) {
+function prepareEmailData(dataToSend) {
   const email = {
-    header: `#${clinitian.clinitianId} is lost!!!`,
+    header: `#${dataToSend.clinitianId} is lost!!!`,
   };
-  if (clinitian.data) {
-    const encodedObj = encodeURIComponent(JSON.stringify(clinitian.data));
-    email.text = `If you recieved this message it means that clinitian #${clinitian.clinitianId} is out of approved safe area boundaries since ${clinitian.lostSince}`;
+  if (dataToSend.data) {
+    const encodedObj = encodeURIComponent(JSON.stringify(dataToSend.data));
+    email.text = `If you recieved this message it means that clinitian #${dataToSend.clinitianId} is out of approved safe area boundaries since ${dataToSend.lostSince}`;
     email.reference = {
       text: "Click to see last clinitian location",
       ref: `http://geojson.io/#data=data:application/json,${encodedObj}`,
     };
   } else {
-    email.text = `If you recieved this message it means we could not connect to clinitian #${clinitian.clinitianId} since ${clinitian.createdAt}`;
+    email.text = `If you recieved this message it means we could not connect to clinitian #${dataToSend.clinitianId} since ${dataToSend.createdAt}`;
     email.reference = null;
   }
   return email;
@@ -96,4 +94,4 @@ function htmlTemplate(email, type = "default") {
   `;
 }
 
-module.exports = sendAlerts;
+module.exports = sendAlert;

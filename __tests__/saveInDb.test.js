@@ -69,22 +69,25 @@ describe("Test save in database", () => {
   });
 
   describe("saving records using saveInDb module", () => {
-    let result = null;
+    let result = [];
     const randUserId1 = Math.round(Math.random() * 10000 + 8);
     const randUserId2 = Math.round(Math.random() * 10000 + 8);
     beforeAll(async () => {
       await mongoose.connect(DB_CONNECTION);
       const records = [
         {
-          id: randUserId1,
+          clinitianId: randUserId1,
           data: dummyData,
         },
         {
-          id: randUserId2,
+          clinitianId: randUserId2,
           data: dummyData,
         },
       ];
-      result = await saveInDb(records);
+      for (const record of records) {
+        const response = await saveInDb(record);
+        result.push(response);
+      }
     });
 
     test(`result is array of records`, () => {
@@ -98,6 +101,10 @@ describe("Test save in database", () => {
     });
     test(`result clinitian counter = 1`, () => {
       expect(result[0].counter).toEqual(1);
+    });
+
+    afterAll(async () => {
+      await mongoose.connection.close();
     });
   });
 });

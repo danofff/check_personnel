@@ -17,7 +17,7 @@ const saveDataInFiles = (clinitiansData) => {
       clinitiansData.forEach((clinitian) => {
         const filePath = path.join(
           folderPath,
-          clinitian.id.toString() + ".json"
+          clinitian.clinitianId.toString() + ".json"
         );
         writeToFile(filePath, clinitian);
       });

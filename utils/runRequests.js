@@ -3,55 +3,62 @@ require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 
 const fetchStatus = require("./fetchStatus");
 const checkPoint = require("./checkPoint");
-const sendAlerts = require("./sendAlerts");
+const sendAlert = require("./sendAlert");
 const saveDataInFiles = require("./saveInJSON");
 const saveInDb = require("./saveInDb");
 const logger = require("./logger");
 
 //array of fetched clinitians (fetch by id);
-const clinitiansArr = [1, 2, 3, 4, 5, 6];
+const clinitiansArr = [1, 2, 3, 4, 5, 6, 7];
 const baseUrl = process.env.API_URL;
 
 const runRequests = async () => {
   //fetch data from api
-  const responses = await Promise.all(
-    clinitiansArr.map((id) => fetchStatus(`${baseUrl}/clinicianstatus/${id}`))
-  );
-
-  const outOfRangeClin = [];
+  // const responses = await Promise.all(
+  //   clinitiansArr.map((id) => fetchStatus(`${baseUrl}/clinicianstatus/${id}`))
+  // );
   const allData = [];
-  //check if clinitian is in boundaries
-  responses.forEach((response, idx) => {
-    if (response.data && response.data.type) {
-      const isInBoundaries = checkPoint(response.data);
-      if (!isInBoundaries) {
-        outOfRangeClin.push({
-          id: idx + 1,
-          isInBoundaries,
-          data: response.data,
-        });
-      }
-      allData.push({ id: idx + 1, isInBoundaries, data: response.data });
-    } else {
-      logger.warn("clinitian #" + (idx + 1) + " geolocation is unknown");
-      outOfRangeClin.push({
-        id: idx + 1,
-        isInBoundaries: false,
-        data: null,
-      });
-    }
-  });
-
-  //saving data logs
-  logger.info("saving data in files is started");
-  saveDataInFiles(allData);
-
-  //saving notInBoundaries in database
-  const sentEmailClin = await saveInDb(outOfRangeClin);
-  if (sentEmailClin.length) {
-    logger.info("sending emails is started");
+  for (const clinitianId of clinitiansArr) {
+    proceedSingleRequest(clinitianId, allData);
   }
-  sendAlerts(sentEmailClin);
 };
+
+async function proceedSingleRequest(clinitianId, allData) {
+  const url = `${baseUrl}/${clinitianId}`;
+  const response = await fetchStatus(url);
+
+  let record = null;
+  //check if response is successfull
+  if (response.data && response.data.type) {
+    //check if clinitian in safe area
+    const isInBoundaries = checkPoint(response.data);
+    record = {
+      clinitianId,
+      isInBoundaries,
+      data: response.data,
+    };
+  } else {
+    logger.warn("clinitian #" + clinitianId + " geolocation is unknown");
+    record = {
+      clinitianId,
+      isInBoundaries: false,
+      data: null,
+    };
+  }
+
+  if (!record.isInBoundaries) {
+    //save in DB
+    const savedInDB = await saveInDb(record);
+    //send alert
+    if (savedInDB) {
+      const resultOfAlertSending = await sendAlert(savedInDB);
+    }
+  }
+  //save data in logs
+  allData.push(record);
+  if (allData.length === clinitiansArr.length) {
+    saveDataInFiles(allData);
+  }
+}
 
 module.exports = runRequests;
