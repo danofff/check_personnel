@@ -5,13 +5,13 @@ const recordSchema = new Schema({
     type: Number,
   },
   data: Object,
-  messegeSent: {
-    type: Boolean,
-    default: false,
-  },
   createdAt: {
     type: Date,
-    default: new Date(),
+    default: Date.now(),
+  },
+  lostSince: {
+    type: Date,
+    default: Date.now(),
   },
   counter: {
     type: Number,

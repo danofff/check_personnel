@@ -1,35 +1,48 @@
 const Record = require("../Models/Record");
 const logger = require("./logger");
 
-const saveInDb = async (notInBoundaries) => {
-  for (const clinitian of notInBoundaries) {
+const saveInDb = async (outOfRangeClin) => {
+  const clinitiansToSendEmail = [];
+  for (const clinitian of outOfRangeClin) {
     //select and check previous status
     try {
-      logger.info(`start to retrive records of clinitian #${clinitian.id}`);
-      const prevRecords = await Record.find({ clinitianId: clinitian.id }).sort(
-        {
-          createdAt: "desc",
-        }
+      logger.info(`start retriving records of clinitian #${clinitian.id}`);
+      const prevRecord = await Record.findOne(
+        { clinitianId: clinitian.id },
+        {},
+        { sort: { createdAt: -1 } }
       );
-      const prevRecord = prevRecords ? prevRecords[0] : null;
-      // console.log("previous record", prevRecord);
 
-      //if save data already sent
-      const counter = prevRecord ? prevRecord.counter : 0;
+      let counter = prevRecord ? prevRecord.counter : 0;
+      let lostSince = prevRecord ? prevRecord.lostSince : Date.now();
+      if (prevRecord) {
+        const minutesDiff =
+          (new Date().getTime() - prevRecord.createdAt.getTime()) / (1000 * 60);
+        if (minutesDiff > 2) {
+          counter = 0;
+          lostSince = Date.now;
+        }
+      }
+
       const recordToSave = new Record({
         clinitianId: clinitian.id,
-        counter: counter + 1 <= 5 ? counter + 1 : 1,
+        counter: counter + 1,
         data: clinitian.data,
+        createdAt: new Date(),
       });
 
       const savedRecord = await recordToSave.save();
-
-      //send messege from here???
-      logger.info("saved record successfully");
+      if (savedRecord.counter % 5 === 1) {
+        clinitiansToSendEmail.push(savedRecord);
+      }
+      logger.info(
+        `saved record for clinitian #${savedRecord.clinitianId} successfully`
+      );
     } catch (error) {
       logger.error(error);
     }
   }
+  return clinitiansToSendEmail;
 };
 
 module.exports = saveInDb;

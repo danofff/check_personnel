@@ -9,24 +9,23 @@ const saveInDb = require("./saveInDb");
 const logger = require("./logger");
 
 //array of fetched clinitians (fetch by id);
-const clinitiansArr = [1, 2, 3, 4, 5, 6, 7];
-const baseUrl = process.env.API_BASE_URL;
+const clinitiansArr = [1, 2, 3, 4, 5, 6];
+const baseUrl = process.env.API_URL;
 
 const runRequests = async () => {
-  const currentDate = new Date(Date.now());
   //fetch data from api
   const responses = await Promise.all(
     clinitiansArr.map((id) => fetchStatus(`${baseUrl}/clinicianstatus/${id}`))
   );
 
-  const notInBoundaries = [];
+  const outOfRangeClin = [];
   const allData = [];
   //check if clinitian is in boundaries
   responses.forEach((response, idx) => {
-    if (response.status === 200) {
+    if (response.data && response.data.type) {
       const isInBoundaries = checkPoint(response.data);
       if (!isInBoundaries) {
-        notInBoundaries.push({
+        outOfRangeClin.push({
           id: idx + 1,
           isInBoundaries,
           data: response.data,
@@ -34,8 +33,8 @@ const runRequests = async () => {
       }
       allData.push({ id: idx + 1, isInBoundaries, data: response.data });
     } else {
-      logger.warn("clinitian #" + (idx + 1) + " geolocation is not known");
-      notInBoundaries.push({
+      logger.warn("clinitian #" + (idx + 1) + " geolocation is unknown");
+      outOfRangeClin.push({
         id: idx + 1,
         isInBoundaries: false,
         data: null,
@@ -48,9 +47,11 @@ const runRequests = async () => {
   saveDataInFiles(allData);
 
   //saving notInBoundaries in database
-  await saveInDb(notInBoundaries);
-
-  // sendAlerts(notInBoundaries, currentDate);
+  const sentEmailClin = await saveInDb(outOfRangeClin);
+  if (sentEmailClin.length) {
+    logger.info("sending emails is started");
+  }
+  sendAlerts(sentEmailClin);
 };
 
 module.exports = runRequests;

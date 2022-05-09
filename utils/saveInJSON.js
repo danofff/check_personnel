@@ -31,8 +31,6 @@ function writeToFile(filepath, data) {
       fs.writeFile(filepath, JSON.stringify(data), (error) => {
         if (error) {
           logger.error(error);
-        } else {
-          logger.info("file created");
         }
       });
     } else {
