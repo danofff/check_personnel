@@ -13,13 +13,7 @@ const logger = createLogger({
   transports: [
     new transports.Console(),
     new transports.File({
-      filename: path.join(
-        __dirname,
-        "..",
-        "logs",
-        "_run_logs",
-        "combined.json"
-      ),
+      filename: path.join(__dirname, "..", "logs", "combined.json"),
     }),
   ],
 });

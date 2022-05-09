@@ -11,14 +11,14 @@ const checkPoint = (data = { features: [] }) => {
     if (feature.geometry.type === "Point") {
       point = feature.geometry.coordinates;
 
-      //decrise point's coords accurency
+      //decrise point's coords accurecy
       point[0] = roundDigit(point[0]);
       point[1] = roundDigit(point[1]);
     }
     //retrive poligons
     if (feature.geometry.type === "Polygon") {
       feature.geometry.coordinates.forEach((coord) => {
-        //decrise polygon's coords accurency
+        //decrise polygon's coords accurecy
         roundCoords(coord);
         polygons.push(coord);
       });

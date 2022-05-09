@@ -49,7 +49,7 @@ async function proceedSingleRequest(clinicianId, allData) {
     const savedInDB = await saveInDb(record);
     //send alert
     if (savedInDB) {
-      const resultOfAlertSending = await sendAlert(savedInDB);
+      await sendAlert(savedInDB);
     }
   }
   //save data in logs

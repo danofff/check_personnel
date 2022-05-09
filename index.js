@@ -13,7 +13,7 @@ const DB_CONNECTION = process.env.DB_CONNECTION;
 mongoose
   .connect(DB_CONNECTION)
   .then((result) => {
-    //cron function to fetch data every ?? seconds
+    //cron function to fetch data every 30 seconds
     logger.info("database runs successfully");
     cron.schedule(cronSchedule, runRequests);
   })

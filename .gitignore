@@ -1,6 +1,6 @@
 node_modules
 .env
-logs
+logs/**/
 REPORT_DANYLO_VERSHKOV.md
-OVERVIEW_OF_THE_WORK_DONE.pdf
+REPORT_DANYLO_VERSHKOV.pdf
 .DS_Store
