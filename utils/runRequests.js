@@ -8,8 +8,8 @@ const saveInDb = require("./saveInDb");
 const saveDataInFiles = require("./saveInJSON");
 const logger = require("./logger");
 
-//array of fetched clinitians (fetch by id);
-const cliniciansArr = [1, 2, 3, 4, 5, 6, 7];
+//array of fetched clinicians (fetch by id);
+const cliniciansArr = [1, 2, 3, 4, 5, 6];
 const baseUrl = process.env.API_URL;
 
 const runRequests = async () => {

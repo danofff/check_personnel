@@ -15,11 +15,11 @@ const saveInDb = async (record) => {
     let counter = prevRecord ? prevRecord.counter : 0;
     let lostSince = prevRecord ? prevRecord.lostSince : record.date;
 
-    //check if clinitian is still lost sequence
+    //check if clinitian is still in "lost" sequence
     if (prevRecord) {
       const minutesDiff =
         (record.date.getTime() - prevRecord.createdAt.getTime()) / (1000 * 60);
-      if (minutesDiff > 1.5) {
+      if (minutesDiff > 1) {
         counter = 0;
         lostSince = record.date;
       }
@@ -35,9 +35,9 @@ const saveInDb = async (record) => {
 
     const savedRecord = await recordToSave.save();
     logger.info(
-      `saved record for clinician #${savedRecord.clinicianId} successfully`
+      `saved record #${savedRecord.id} for clinician #${savedRecord.clinicianId} successfully`
     );
-    if (savedRecord.counter % 5 === 1) {
+    if (savedRecord.counter % 10 === 1) {
       recordToReturn = savedRecord;
     }
   } catch (error) {
