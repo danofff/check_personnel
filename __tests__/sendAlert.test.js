@@ -5,7 +5,7 @@ require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 describe("Test send alerts emails", () => {
   const sendingEmailArr = [
     {
-      clinitianId: 4,
+      clinicianId: 4,
       data: {
         type: "FeatureCollection",
         features: [
@@ -42,8 +42,38 @@ describe("Test send alerts emails", () => {
       createdAt: "2022-05-09T04:43:00.682Z",
       lostSince: "2022-05-09T04:29:22.300Z",
       counter: 21,
-      _id: new ObjectId("62789bd445af7a34f49eda93"),
-      __v: 0,
+    },
+    {
+      clinicianId: 1,
+      data: null,
+      createdAt: "2022-05-09T14:50:01.500+00:00",
+      lostSince: "2022-05-09T14:50:01.500+00:00",
     },
   ];
+
+  const emailSendResponses = [];
+  beforeAll(async () => {
+    for (const dataToSend of sendingEmailArr) {
+      const result = await sendAlert(dataToSend, "sam.cassel@yandex.com");
+      emailSendResponses.push(result);
+    }
+  });
+
+  test(`result is array of email sending responses`, () => {
+    expect(Array.isArray(emailSendResponses)).toEqual(true);
+  });
+  test(`results array length = 2`, () => {
+    expect(emailSendResponses.length).toEqual(2);
+  });
+  test(`result accepted is not empty`, () => {
+    expect(emailSendResponses[0].accepted.length).not.toEqual(0);
+  });
+  test(`result accepted email = sam.cassel@yandex.com`, () => {
+    expect(emailSendResponses[0].accepted[0]).toEqual("sam.cassel@yandex.com");
+  });
+  test(`result accepted email from = alert@checkpersonnel.com`, () => {
+    expect(emailSendResponses[0].envelope.from).toEqual(
+      "alert@checkpersonnel.com"
+    );
+  });
 });

@@ -5,35 +5,37 @@ const saveInDb = async (record) => {
   //select and check previous status
   let recordToReturn = null;
   try {
-    logger.info(`start retriving record of clinitian #${record.clinitianId}`);
+    logger.info(`start retriving record of clinician #${record.clinicianId}`);
     const prevRecord = await Record.findOne(
-      { clinitianId: record.clinitianId },
+      { clinicianId: record.clinicianId },
       {},
       { sort: { createdAt: -1 } }
     );
 
     let counter = prevRecord ? prevRecord.counter : 0;
-    let lostSince = prevRecord ? prevRecord.lostSince : Date.now();
+    let lostSince = prevRecord ? prevRecord.lostSince : record.date;
 
+    //check if clinitian is still lost sequence
     if (prevRecord) {
       const minutesDiff =
-        (new Date().getTime() - prevRecord.createdAt.getTime()) / (1000 * 60);
-      if (minutesDiff > 2) {
+        (record.date.getTime() - prevRecord.createdAt.getTime()) / (1000 * 60);
+      if (minutesDiff > 1.5) {
         counter = 0;
-        lostSince = Date.now;
+        lostSince = record.date;
       }
     }
 
     const recordToSave = new Record({
-      clinitianId: record.clinitianId,
+      clinicianId: record.clinicianId,
       counter: counter + 1,
       data: record.data,
-      createdAt: Date.now(),
+      createdAt: record.date,
+      lostSince: lostSince,
     });
 
     const savedRecord = await recordToSave.save();
     logger.info(
-      `saved record for clinitian #${savedRecord.clinitianId} successfully`
+      `saved record for clinician #${savedRecord.clinicianId} successfully`
     );
     if (savedRecord.counter % 5 === 1) {
       recordToReturn = savedRecord;

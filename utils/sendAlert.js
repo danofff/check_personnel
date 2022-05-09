@@ -17,7 +17,8 @@ let mailOptions = {
   subject: "Alert!!!",
 };
 
-const sendAlert = async (dataToSend) => {
+const sendAlert = async (dataToSend, emailTo = null) => {
+  mailOptions.to = emailTo || mailOptions.to;
   //prepare email data
   const email = prepareEmailData(dataToSend);
 
@@ -28,7 +29,7 @@ const sendAlert = async (dataToSend) => {
   try {
     const response = await transporter.sendMail(mailOptions);
     logger.info(
-      "email was sent successfully about clinitian #" + dataToSend.clinitianId
+      "email was sent successfully about clinitian #" + dataToSend.clinicianId
     );
     return response;
   } catch (error) {
@@ -38,17 +39,17 @@ const sendAlert = async (dataToSend) => {
 
 function prepareEmailData(dataToSend) {
   const email = {
-    header: `#${dataToSend.clinitianId} is lost!!!`,
+    header: `#${dataToSend.clinicianId} is lost!!!`,
   };
   if (dataToSend.data) {
     const encodedObj = encodeURIComponent(JSON.stringify(dataToSend.data));
-    email.text = `If you recieved this message it means that clinitian #${dataToSend.clinitianId} is out of approved safe area boundaries since ${dataToSend.lostSince}`;
+    email.text = `If you recieved this message it means that clinitian #${dataToSend.clinicianId} is out of approved safe area boundaries since ${dataToSend.lostSince}`;
     email.reference = {
       text: "Click to see last clinitian location",
       ref: `http://geojson.io/#data=data:application/json,${encodedObj}`,
     };
   } else {
-    email.text = `If you recieved this message it means we could not connect to clinitian #${dataToSend.clinitianId} since ${dataToSend.createdAt}`;
+    email.text = `If you recieved this message it means we could not connect to clinitian #${dataToSend.clinicianId} since ${dataToSend.createdAt}`;
     email.reference = null;
   }
   return email;

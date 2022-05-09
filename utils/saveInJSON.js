@@ -2,7 +2,7 @@ const path = require("path");
 const fs = require("fs");
 const logger = require("./logger");
 
-const saveDataInFiles = (clinitiansData) => {
+const saveDataInFiles = (cliniciansData) => {
   const folderPath = path.join(
     __dirname,
     "..",
@@ -14,12 +14,12 @@ const saveDataInFiles = (clinitiansData) => {
       logger.error("error in folder creation", error);
     } else {
       logger.info("folder is created");
-      clinitiansData.forEach((clinitian) => {
+      cliniciansData.forEach((clinician) => {
         const filePath = path.join(
           folderPath,
-          clinitian.clinitianId.toString() + ".json"
+          clinician.clinicianId.toString() + ".json"
         );
-        writeToFile(filePath, clinitian);
+        writeToFile(filePath, clinician);
       });
     }
   });

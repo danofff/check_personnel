@@ -43,7 +43,7 @@ describe("Test save in database", () => {
     beforeAll(async () => {
       await mongoose.connect(DB_CONNECTION);
       const record = new Record({
-        clinitianId: 7,
+        clinicianId: 7,
         counter: 1,
         data: dummyData,
         createdAt: date,
@@ -58,7 +58,7 @@ describe("Test save in database", () => {
       expect(new Date(response.createdAt).getTime()).toEqual(date);
     });
     test("response clinitian id = 7", () => {
-      expect(response.clinitianId).toEqual(7);
+      expect(response.clinicianId).toEqual(7);
     });
     test("response counter equals 1", () => {
       expect(response.counter).toEqual(1);
@@ -76,11 +76,11 @@ describe("Test save in database", () => {
       await mongoose.connect(DB_CONNECTION);
       const records = [
         {
-          clinitianId: randUserId1,
+          clinicianId: randUserId1,
           data: dummyData,
         },
         {
-          clinitianId: randUserId2,
+          clinicianId: randUserId2,
           data: dummyData,
         },
       ];
@@ -96,10 +96,10 @@ describe("Test save in database", () => {
     test(`result array length = 2`, () => {
       expect(result.length).toEqual(2);
     });
-    test(`result clinitian id = ${randUserId1}`, () => {
-      expect(result[0].clinitianId).toEqual(randUserId1);
+    test(`result clinician id = ${randUserId1}`, () => {
+      expect(result[0].clinicianId).toEqual(randUserId1);
     });
-    test(`result clinitian counter = 1`, () => {
+    test(`result clinician counter = 1`, () => {
       expect(result[0].counter).toEqual(1);
     });
 

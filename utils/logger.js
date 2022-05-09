@@ -1,18 +1,14 @@
 const path = require("path");
 const { createLogger, format, transports } = require("winston");
-const { timestamp, combine, printf, colorize, errors, json } = format;
+const { timestamp, combine, errors, json } = format;
 
-// const logFormat = printf(({ level, message, timestamp, stack }) => {
+// const logFormat = format.printf(({ level, message, timestamp, stack }) => {
 //   return `${timestamp} ${level}: ${stack || message}`;
 // });
 
 const logger = createLogger({
   level: "info",
-  format: combine(
-    timestamp(/*{ format: "YYYY-MM-DD HH:mm:ss" }*/),
-    errors({ stack: true }),
-    json()
-  ),
+  format: combine(timestamp(), errors({ stack: true }), json()),
   defaultMeta: { service: "CPG" },
   transports: [
     new transports.Console(),

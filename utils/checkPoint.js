@@ -1,35 +1,5 @@
 const turf = require("@turf/helpers");
 const booleanPointInPolygon = require("@turf/boolean-point-in-polygon");
-// const data = {
-//   type: "FeatureCollection",
-//   features: [
-//     {
-//       type: "Feature",
-//       properties: {},
-//       geometry: {
-//         type: "Polygon",
-//         coordinates: [
-//           [
-//             [-122.1799850463867, 37.46164222168521],
-//             [-122.1928596496582, 37.45551035774642],
-//             [-122.18324661254881, 37.45046822629871],
-//             [-122.17964172363281, 37.457009304251244],
-//             [-122.17706680297852, 37.46027962870619],
-//             [-122.1799850463867, 37.46164222168521],
-//           ],
-//         ],
-//       },
-//     },
-//     {
-//       type: "Feature",
-//       properties: {},
-//       geometry: {
-//         type: "Point",
-//         coordinates: [-122.18487739562988, 37.45714557062557],
-//       },
-//     },
-//   ],
-// };
 
 const checkPoint = (data = { features: [] }) => {
   let point;
