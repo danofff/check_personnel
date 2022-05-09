@@ -2,4 +2,5 @@ node_modules
 .env
 logs
 REPORT_DANYLO_VERSHKOV.md
- .DS_Store
+OVERVIEW_OF_THE_WORK_DONE.pdf
+.DS_Store

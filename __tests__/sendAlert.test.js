@@ -2,7 +2,7 @@ const sendAlert = require("../utils/sendAlert");
 const path = require("path");
 require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 
-describe("Test send alerts emails", () => {
+describe("test sending emails", () => {
   const sendingEmailArr = [
     {
       clinicianId: 4,
@@ -50,7 +50,6 @@ describe("Test send alerts emails", () => {
       lostSince: "2022-05-09T14:50:01.500+00:00",
     },
   ];
-
   const emailSendResponses = [];
   beforeAll(async () => {
     for (const dataToSend of sendingEmailArr) {
